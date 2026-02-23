@@ -912,3 +912,74 @@ body.admin-login-page {
   background: transparent;
   cursor: pointer;
 }
+
+/* ===== ADMIN LOGIN UI IMPROVEMENTS ===== */
+
+/* Khoảng cách phía trên nút đăng nhập */
+.admin-form .admin-submit[type="submit"] {
+  margin-top: 20px;
+}
+
+/* Label cùng kích thước với text trong button */
+.admin-field label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Button chung */
+.admin-submit {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Button Đăng nhập (giữ màu chính) */
+.admin-submit[type="submit"] {
+  background: #1e88e5;
+  color: #fff;
+}
+
+.admin-submit[type="submit"]:hover {
+  background: #1976d2;
+}
+
+/* Button "Đi đến trang chủ" khi chưa login */
+#goHomeBtnLogin {
+  background: #90caf9;   /* xanh da trời nhạt */
+  color: #0d47a1;
+}
+
+#goHomeBtnLogin:hover {
+  background: #64b5f6;
+}
+
+/* Button khi đã login */
+#goHomeBtn {
+  background: #1e88e5;
+  color: #fff;
+}
+
+#goHomeBtn:hover {
+  background: #1976d2;
+}
+
+/* Logout button */
+.admin-logout {
+  background: #ef5350;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-logout:hover {
+  background: #d32f2f;
+}

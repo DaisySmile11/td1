@@ -92,23 +92,32 @@ function updateAdminPageUi() {
     });
   }
 
-  function bindAdminActions() {
-    const goHomeBtn = document.getElementById("goHomeBtn");
-    if (goHomeBtn) {
-      goHomeBtn.addEventListener("click", () => {
-        window.location.href = "index.html";
-      });
-    }
-
-    const logoutBtn = document.getElementById("adminLogoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        clearSession();
-        updateAdminPageUi();
-        updateExportUi();
-      });
-    }
+ function bindAdminActions() {
+  // Button khi đã login
+  const goHomeBtn = document.getElementById("goHomeBtn");
+  if (goHomeBtn) {
+    goHomeBtn.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
   }
+
+  // Button khi chưa login
+  const goHomeBtnLogin = document.getElementById("goHomeBtnLogin");
+  if (goHomeBtnLogin) {
+    goHomeBtnLogin.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  }
+
+  const logoutBtn = document.getElementById("adminLogoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      clearSession();
+      updateAdminPageUi();
+      updateExportUi();
+    });
+  }
+}
 
   // ===== CSV export (device.html) =====
   function downloadTextFile(filename, text) {
