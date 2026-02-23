@@ -49,7 +49,7 @@ export const THRESHOLDS = {
   PH_HIGH: 8.5,
 
   // Offline
-  OFFLINE_MINUTES: 180, // 3 giờ
+  OFFLINE_MINUTES: 6, // 3 giờ
 };
 
 // Helpers
