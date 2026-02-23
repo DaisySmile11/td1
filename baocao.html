@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Báo cáo & lịch sử - Giám sát độ mặn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">Giám sát độ mặn</div>
+    <nav class="main-nav">
+      <a href="index.html">Trang chủ</a>
+      <a href="devices.html">Danh sách thiết bị</a>
+      <a href="baocao.html" class="active">Báo cáo & lịch sử</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <div class="section-header">
+        <h1>Báo cáo thống kê</h1>
+        <p class="section-subtitle">
+          Xem lại xu hướng độ mặn, nhiệt độ, pH và mức pin theo ngày, tháng, năm.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="tabs">
+          <button class="tab-button active" data-range="day">Theo ngày</button>
+          <button class="tab-button" data-range="month">Theo tháng</button>
+          <button class="tab-button" data-range="year">Theo năm</button>
+        </div>
+        <canvas id="reportChart" height="150"></canvas>
+        <p class="note-inline">
+          Dữ liệu đang lấy từ Firestore (thật).
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Cảnh báo gần đây</h2>
+        <ul class="alert-list" id="recentAlerts">
+          <li class="alert-item alert-offline">Đang tải...</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <span>Giám sát độ mặn nước &copy; 2025</span>
+  </footer>
+
+  <!-- ✅ modules -->
+  <script type="module" src="assets/js/data.js"></script>
+  <script type="module" src="assets/js/charts.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

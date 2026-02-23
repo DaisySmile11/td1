@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chi tiết thiết bị - Giám sát độ mặn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">Giám sát độ mặn</div>
+    <nav class="main-nav">
+      <a href="index.html">Trang chủ</a>
+      <a href="devices.html">Danh sách thiết bị</a>
+      <a href="baocao.html">Báo cáo & lịch sử</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <div class="section-header">
+        <h1 id="detailTitle">Chi tiết thiết bị</h1>
+        <p class="section-subtitle" id="detailSubtitle">
+          Theo dõi realtime, lịch sử theo khoảng thời gian và cảnh báo.
+        </p>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="detailDeviceSelect">Chọn thiết bị:</label>
+          <div class="select-wrapper">
+            <select id="detailDeviceSelect"></select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label for="detailRange">Khoảng thời gian:</label>
+          <div class="select-wrapper">
+            <select id="detailRange">
+                <option value="300">5m</option>
+                <option value="900">15m</option>
+                <option value="1800">30m</option>
+                <option value="3600">1h</option>
+
+                <option value="86400" selected>24h</option>
+                <option value="2592000">30d</option>
+                <option value="31536000">365d</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-row">
+        <div class="card kpi-card">
+          <h3>Độ mặn</h3>
+          <p class="kpi-value" id="dSal">-- ‰</p>
+          <p class="kpi-note" id="dSalNote">--</p>
+        </div>
+        <div class="card kpi-card">
+          <h3>Nhiệt độ</h3>
+          <p class="kpi-value" id="dTemp">-- °C</p>
+          <p class="kpi-note" id="dTempNote">--</p>
+        </div>
+        <div class="card kpi-card">
+          <h3>pH</h3>
+          <p class="kpi-value" id="dPh">--</p>
+          <p class="kpi-note" id="dPhNote">--</p>
+        </div>
+        <div class="card kpi-card">
+          <h3>Pin</h3>
+          <p class="kpi-value" id="dBat">-- %</p>
+          <p class="kpi-note" id="dBatNote">--</p>
+        </div>
+        <div class="card kpi-card">
+          <h3>Trạng thái</h3>
+          <p class="kpi-value" id="dStatus">--</p>
+          <p class="kpi-note" id="dStatusNote">--</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h2>Biểu đồ chi tiết</h2>
+          <span class="card-badge" id="detailUpdated">Updated: --</span>
+        </div>
+        <canvas id="detailChart" height="150"></canvas>
+        <p class="note-inline" id="detailChartHint">--</p>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <h2>Dữ liệu latest (JSON)</h2>
+        </div>
+        <pre class="json-box" id="detailJson">Loading...</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <span>Giám sát độ mặn nước &copy; 2025</span>
+  </footer>
+
+  <!-- ✅ CHỈ load device.js -->
+<script type="module" src="assets/js/device.js"></script>
+</body>
+</html>

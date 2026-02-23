@@ -1,0 +1,232 @@
+// assets/js/charts.js
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+import { db, fmtHM, safeNum } from "./data.js";
+
+const MAX_READ_DOCS = 1400;
+const MAX_PLOT_POINTS = 360;
+
+const BUCKET_5M = 300;
+const BUCKET_1H = 3600;
+
+function epochSecNow() {
+  return Math.floor(Date.now() / 1000);
+}
+
+// align window (lag 1 bucket như file A)
+function alignedWindow(nowSec, rangeSec, bucketSec, lagBuckets = 1) {
+  const alignedEnd = Math.floor(nowSec / bucketSec) * bucketSec - (lagBuckets * bucketSec);
+  const alignedStart = alignedEnd - rangeSec + bucketSec;
+  return { startSec: alignedStart, endSec: alignedEnd };
+}
+
+function downsampleUniform(rowsAsc, maxPlot) {
+  if (rowsAsc.length <= maxPlot) return rowsAsc;
+  const step = Math.ceil(rowsAsc.length / maxPlot);
+  const out = [];
+  for (let i = 0; i < rowsAsc.length; i += step) out.push(rowsAsc[i]);
+  if (out[out.length - 1] !== rowsAsc[rowsAsc.length - 1]) out.push(rowsAsc[rowsAsc.length - 1]);
+  return out;
+}
+
+// yesterday window theo local time (VN chạy local ok)
+function yesterdayWindowSec() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0); // start today
+  const endSec = Math.floor(d.getTime() / 1000);
+  const startSec = endSec - 86400;
+  return { startSec, endSec };
+}
+
+async function fetchSeries(deviceId, rangeSec, opts = {}) {
+  const nowSec = opts.endSec ?? epochSecNow();
+  const useHourly = opts.preferHourly || rangeSec >= 86400;
+
+  if (useHourly) {
+    // hourly aligned
+    const { startSec, endSec } = alignedWindow(nowSec, rangeSec, BUCKET_1H, 1);
+    const want = Math.min(Math.floor(rangeSec / BUCKET_1H) + 3, MAX_READ_DOCS);
+
+    const qH = query(
+      collection(db, "devices", deviceId, "stats_hourly"),
+      where("bucketStartSec", ">=", startSec),
+      where("bucketStartSec", "<=", endSec),
+      orderBy("bucketStartSec", "asc"),
+      limit(want)
+    );
+
+    const snap = await getDocs(qH);
+    return { rows: snap.docs.map(d => d.data()), mode: "hourly" };
+  }
+
+  // 5m aligned
+  const { startSec, endSec } = alignedWindow(nowSec, rangeSec, BUCKET_5M, 1);
+  const want = Math.min(Math.floor(rangeSec / BUCKET_5M) + 3, MAX_READ_DOCS);
+
+  const q5 = query(
+    collection(db, "devices", deviceId, "stats_5m"),
+    where("bucketStartSec", ">=", startSec),
+    where("bucketStartSec", "<=", endSec),
+    orderBy("bucketStartSec", "asc"),
+    limit(want)
+  );
+
+  const snap = await getDocs(q5);
+  return { rows: snap.docs.map(d => d.data()), mode: "5m" };
+}
+
+function buildChart(ctx, datasets) {
+  return new Chart(ctx, {
+    type: "line",
+    data: { labels: [], datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: true } },
+      stacked: false,
+      scales: {
+        // trục trái chỉ độ mặn + nhiệt độ
+        y: {
+          type: "linear",
+          position: "left",
+          title: { display: true, text: "Độ mặn / Nhiệt độ" },
+        },
+        // pin
+        y2: {
+          type: "linear",
+          position: "right",
+          min: 0,
+          max: 100,
+          title: { display: true, text: "Pin (%)" },
+          grid: { drawOnChartArea: false },
+        },
+        // pH riêng
+        y3: {
+          type: "linear",
+          position: "right",
+          min: 0,
+          max: 14,
+          title: { display: true, text: "pH" },
+          grid: { drawOnChartArea: false },
+        },
+      },
+    },
+  });
+}
+
+// ===== INDEX PAGE =====
+export async function renderIndexMainChart(deviceId) {
+  const canvas = document.getElementById("mainChart");
+  if (!canvas) return;
+
+  const timeSel = document.getElementById("timeRange");
+  const rangeKey = timeSel?.value ?? "day";
+
+  // rangeSec + endSec cho yesterday
+  let rangeSec = 86400;
+  let endSec = null;
+  let preferHourly = false;
+
+  if (rangeKey === "yesterday") {
+    const w = yesterdayWindowSec();
+    rangeSec = 86400;
+    endSec = w.endSec; // cố định end = 00:00 hôm nay
+    preferHourly = false;
+  } else if (rangeKey === "month") {
+    rangeSec = 30 * 86400;
+    preferHourly = true;
+  } else if (rangeKey === "year") {
+    rangeSec = 365 * 86400;
+    preferHourly = true;
+  } else {
+    rangeSec = 24 * 3600;
+    preferHourly = false;
+  }
+
+  const { rows, mode } = await fetchSeries(deviceId, rangeSec, { preferHourly, endSec });
+
+  const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
+  const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
+  const labels = tArr.map(t => fmtHM(t));
+
+  const sal = slim.map(r => safeNum(r.avgSalinity ?? r.salinity ?? null, null));
+  const temp = slim.map(r => safeNum(r.avgTemperature ?? r.temperature ?? null, null));
+  const ph = slim.map(r => safeNum(r.avgPh ?? r.ph ?? null, null));
+  const bat = slim.map(r => safeNum(r.avgBatteryPct ?? r.batteryPct ?? null, null));
+
+  if (!window.__mainChart) {
+    const ctx = canvas.getContext("2d");
+    window.__mainChart = buildChart(ctx, [
+      { label: "Độ mặn (‰)", data: [], borderColor: "rgba(0,123,255,1)", backgroundColor: "rgba(0,123,255,0.12)", tension: 0.35, pointRadius: 0, fill: true },
+      { label: "Nhiệt độ (°C)", data: [], borderColor: "rgba(220,53,69,1)", backgroundColor: "rgba(220,53,69,0.10)", tension: 0.35, pointRadius: 0, fill: true },
+      { label: "pH", data: [], borderColor: "rgba(16,185,129,1)", backgroundColor: "rgba(16,185,129,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y3" },
+      { label: "Pin (%)", data: [], borderColor: "rgba(255,193,7,1)", backgroundColor: "rgba(255,193,7,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y2" },
+    ]);
+  }
+
+  window.__mainChart.data.labels = labels;
+  window.__mainChart.data.datasets[0].data = sal;
+  window.__mainChart.data.datasets[1].data = temp;
+  window.__mainChart.data.datasets[2].data = ph;
+  window.__mainChart.data.datasets[3].data = bat;
+  window.__mainChart.update();
+
+  const note = document.querySelector(".note-pill-text");
+  if (note) {
+    note.textContent =
+      rangeKey === "yesterday"
+        ? `Biểu đồ: Hôm qua • nguồn: ${mode}`
+        : `Biểu đồ lấy dữ liệu thật từ Firestore (${mode}).`;
+  }
+}
+
+// ===== DEVICE DETAIL PAGE =====
+// rangeSec = số giây (300/900/1800/3600/86400/...)
+export async function renderDeviceDetailChart(deviceId, rangeSec) {
+  const canvas = document.getElementById("detailChart");
+  if (!canvas) return;
+
+  const rs = Number(rangeSec);
+  const safeRangeSec = Number.isFinite(rs) ? rs : 86400;
+
+  // >= 24h dùng hourly để nhẹ; <24h dùng 5m
+  const preferHourly = safeRangeSec >= 86400;
+
+  const { rows, mode } = await fetchSeries(deviceId, safeRangeSec, { preferHourly });
+
+  const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
+  const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
+  const labels = tArr.map(t => fmtHM(t));
+
+  const sal = slim.map(r => safeNum(r.avgSalinity ?? r.salinity ?? null, null));
+  const temp = slim.map(r => safeNum(r.avgTemperature ?? r.temperature ?? null, null));
+  const ph = slim.map(r => safeNum(r.avgPh ?? r.ph ?? null, null));
+  const bat = slim.map(r => safeNum(r.avgBatteryPct ?? r.batteryPct ?? null, null));
+
+  if (!window.__detailChart) {
+    const ctx = canvas.getContext("2d");
+    window.__detailChart = buildChart(ctx, [
+      { label: "Độ mặn (‰)", data: [], borderColor: "rgba(0,123,255,1)", backgroundColor: "rgba(0,123,255,0.12)", tension: 0.35, pointRadius: 0, fill: true },
+      { label: "Nhiệt độ (°C)", data: [], borderColor: "rgba(220,53,69,1)", backgroundColor: "rgba(220,53,69,0.10)", tension: 0.35, pointRadius: 0, fill: true },
+      { label: "pH", data: [], borderColor: "rgba(16,185,129,1)", backgroundColor: "rgba(16,185,129,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y3" },
+      { label: "Pin (%)", data: [], borderColor: "rgba(255,193,7,1)", backgroundColor: "rgba(255,193,7,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y2" },
+    ]);
+  }
+
+  window.__detailChart.data.labels = labels;
+  window.__detailChart.data.datasets[0].data = sal;
+  window.__detailChart.data.datasets[1].data = temp;
+  window.__detailChart.data.datasets[2].data = ph;
+  window.__detailChart.data.datasets[3].data = bat;
+  window.__detailChart.update();
+
+  const hint = document.getElementById("detailChartHint");
+  if (hint) hint.textContent = `Nguồn: ${mode} • points=${slim.length}`;
+}

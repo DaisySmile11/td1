@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Danh sách thiết bị - Giám sát độ mặn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">Giám sát độ mặn</div>
+    <nav class="main-nav">
+      <a href="index.html">Trang chủ</a>
+      <a href="devices.html" class="active">Danh sách thiết bị</a>
+      <a href="baocao.html">Báo cáo & lịch sử</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <div class="section-header">
+        <h1>Danh sách thiết bị</h1>
+        <p class="section-subtitle">
+          Tổng hợp trạng thái các thiết bị đo độ mặn hiện đang cấu hình trong hệ thống.
+        </p>
+      </div>
+
+      <div class="card">
+        <table class="device-table">
+          <thead>
+            <tr>
+              <th>Mã thiết bị</th>
+              <th>Tên hiển thị</th>
+              <th>Vị trí</th>
+              <th>Độ mặn (‰)</th>
+              <th>Nhiệt độ (°C)</th>
+              <th>pH</th>
+              <th>Pin (%)</th>
+              <th>Trạng thái</th>
+              <th>Cập nhật cuối</th>
+            </tr>
+          </thead>
+          <tbody id="deviceTableBody"></tbody>
+        </table>
+
+        <p class="note-inline">
+          Dòng trong bảng được tô màu theo mức cảnh báo (ALERT/WARN) và offline.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <span>Giám sát độ mặn nước &copy; 2025</span>
+  </footer>
+
+  <!-- ✅ chỉ load devices.js -->
+  <script type="module" src="assets/js/devices.js"></script>
+</body>
+</html>
