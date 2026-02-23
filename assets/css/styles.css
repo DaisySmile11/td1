@@ -587,13 +587,6 @@ body {
   font-size:13px;
   margin:0;
 }
-/* Fix chart bị kéo dài quá mức */
-#detailChart {
-  width: 100% !important;
-  height: 320px !important;  /* bạn đổi 280/320/360 tùy ý */
-  display: block;
-}
-
 /* ===== Navbar mobile ===== */
 .nav-toggle {
   display: none;
@@ -786,3 +779,34 @@ body {
 .legend-highsal{ background:#dc2626; }
 .legend-lowbat{ background:#facc15; }
 .legend-offline{ background:#6b7280; }
+
+/* ===== Chart containers (avoid canvas blur/stretch) ===== */
+.chart-container{
+  position: relative;
+  width: 100%;
+  height: 320px; /* adjust as needed */
+}
+#mainChart, #detailChart{
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* ===== Sortable table headers ===== */
+th.sortable{
+  cursor: pointer;
+  user-select: none;
+}
+th.sortable:hover{
+  background-color: #eff6ff;
+}
+th.sortable[data-order="asc"]::after{
+  content: " ▲";
+  font-size: 0.75em;
+  color: var(--text-muted);
+}
+th.sortable[data-order="desc"]::after{
+  content: " ▼";
+  font-size: 0.75em;
+  color: var(--text-muted);
+}

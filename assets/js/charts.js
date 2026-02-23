@@ -21,6 +21,7 @@ function epochSecNow() {
 }
 
 function fmtLabelByRange(dateObj, rangeSec) {
+
   if (!dateObj) return "";
 
   const d = dateObj?.toDate ? dateObj.toDate() : dateObj;
@@ -44,6 +45,20 @@ function fmtLabelByRange(dateObj, rangeSec) {
   const yyyy = d.getFullYear();
   return `${mm}/${yyyy}`;
 }
+
+
+function fmtTooltipDateTime(v) {
+  if (!v) return "";
+  const d = v?.toDate ? v.toDate() : v;
+  // vi-VN dd/mm/yyyy, 24h
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+}
+
 
 // align window (lag 1 bucket như file A)
 function alignedWindow(nowSec, rangeSec, bucketSec, lagBuckets = 1) {
@@ -107,14 +122,27 @@ async function fetchSeries(deviceId, rangeSec, opts = {}) {
   return { rows: snap.docs.map(d => d.data()), mode: "5m" };
 }
 
-function buildChart(ctx, datasets) {
-  return new Chart(ctx, {
+function buildChart(ctx, datasets, times = []) {
+  const c = new Chart(ctx, {
     type: "line",
     data: { labels: [], datasets },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
-      plugins: { legend: { display: true } },
+      plugins: {
+        legend: { display: true },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              if (!items || !items.length) return "";
+              const idx = items[0].dataIndex;
+              const t = items[0].chart?.$times?.[idx] ?? null;
+              return t ? fmtTooltipDateTime(t) : (items[0].label ?? "");
+            },
+          },
+        },
+      },
       stacked: false,
       scales: {
         // trục trái chỉ độ mặn + nhiệt độ
@@ -144,6 +172,8 @@ function buildChart(ctx, datasets) {
       },
     },
   });
+  c.$times = Array.isArray(times) ? times : [];
+  return c;
 }
 
 // ===== INDEX PAGE =====
@@ -193,9 +223,10 @@ export async function renderIndexMainChart(deviceId) {
       { label: "Nhiệt độ (°C)", data: [], borderColor: "rgba(220,53,69,1)", backgroundColor: "rgba(220,53,69,0.10)", tension: 0.35, pointRadius: 0, fill: true },
       { label: "pH", data: [], borderColor: "rgba(16,185,129,1)", backgroundColor: "rgba(16,185,129,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y3" },
       { label: "Pin (%)", data: [], borderColor: "rgba(255,193,7,1)", backgroundColor: "rgba(255,193,7,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y2" },
-    ]);
+    ], tArr);
   }
 
+  window.__mainChart.$times = tArr;
   window.__mainChart.data.labels = labels;
   window.__mainChart.data.datasets[0].data = sal;
   window.__mainChart.data.datasets[1].data = temp;
@@ -242,9 +273,10 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
       { label: "Nhiệt độ (°C)", data: [], borderColor: "rgba(220,53,69,1)", backgroundColor: "rgba(220,53,69,0.10)", tension: 0.35, pointRadius: 0, fill: true },
       { label: "pH", data: [], borderColor: "rgba(16,185,129,1)", backgroundColor: "rgba(16,185,129,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y3" },
       { label: "Pin (%)", data: [], borderColor: "rgba(255,193,7,1)", backgroundColor: "rgba(255,193,7,0.10)", tension: 0.35, pointRadius: 0, fill: true, yAxisID: "y2" },
-    ]);
+    ], tArr);
   }
 
+  window.__detailChart.$times = tArr;
   window.__detailChart.data.labels = labels;
   window.__detailChart.data.datasets[0].data = sal;
   window.__detailChart.data.datasets[1].data = temp;
@@ -254,4 +286,9 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
 
   const hint = document.getElementById("detailChartHint");
   if (hint) hint.textContent = `Nguồn: ${mode} • points=${slim.length}`;
+}
+
+// Public helper for device detail table / exports
+export async function fetchDeviceSeries(deviceId, rangeSec, opts = {}) {
+  return await fetchSeries(deviceId, rangeSec, opts);
 }

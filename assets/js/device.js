@@ -18,9 +18,187 @@ import {
   isOfflineFromLatest,
 } from "./data.js";
 
-import { renderDeviceDetailChart } from "./charts.js";
+import { renderDeviceDetailChart, fetchDeviceSeries } from "./charts.js";
 
 const $ = (id) => document.getElementById(id);
+
+// =====================
+// Detail table (history)
+// =====================
+const historyCache = new Map(); // key: `${deviceId}:${rangeSec}` => normalizedRows
+let currentSort = { key: "colDateTime", order: "desc" };
+
+function toDateObj(v) {
+  if (!v) return null;
+  if (v?.toDate) return v.toDate();
+  if (v instanceof Date) return v;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function fmtDate(d) {
+  if (!d) return "--";
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function fmtTime(d) {
+  if (!d) return "--";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  return `${hh}:${mi}:${ss}`;
+}
+
+function normalizeSeriesRows(rows = []) {
+  return rows
+    .map((r) => {
+      const t =
+        r.bucketStart ||
+        (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null) ||
+        r.measuredAt ||
+        r.updatedAt ||
+        null;
+
+      const d = toDateObj(t);
+      const sal = safeNum(r.avgSalinity ?? r.salinity ?? null, null);
+      const ph = safeNum(r.avgPh ?? r.ph ?? null, null);
+      const temp = safeNum(r.avgTemperature ?? r.temperature ?? null, null);
+      const bat = safeNum(r.avgBatteryPct ?? r.batteryPct ?? null, null);
+
+      return {
+        colDateTime: d ? d.getTime() : 0,
+        time: fmtTime(d),
+        date: fmtDate(d),
+        salinity: sal,
+        ph,
+        temperature: temp,
+        battery: bat,
+      };
+    })
+    .filter((x) => x.colDateTime !== 0);
+}
+
+function setSortIndicator(activeKey, order) {
+  const table = document.getElementById("detailDataTable");
+  if (!table) return;
+
+  table.querySelectorAll("th.sortable").forEach((th) => {
+    const k = th.getAttribute("data-key");
+    if (!k) return;
+    if (k === activeKey) th.setAttribute("data-order", order);
+    else th.removeAttribute("data-order");
+  });
+}
+
+function sortRows(rows, key, order) {
+  const dir = order === "asc" ? 1 : -1;
+
+  const getVal = (r) => {
+    switch (key) {
+      case "colTime":
+        return r.time;
+      case "colDate":
+        return r.date;
+      case "colSal":
+        return r.salinity ?? Number.NEGATIVE_INFINITY;
+      case "colPh":
+        return r.ph ?? Number.NEGATIVE_INFINITY;
+      case "colTemp":
+        return r.temperature ?? Number.NEGATIVE_INFINITY;
+      case "colBat":
+        return r.battery ?? Number.NEGATIVE_INFINITY;
+      default:
+        return r.colDateTime;
+    }
+  };
+
+  return [...rows].sort((a, b) => {
+    const va = getVal(a);
+    const vb = getVal(b);
+
+    // numbers
+    if (typeof va === "number" && typeof vb === "number") return (va - vb) * dir;
+
+    // strings
+    return String(va).localeCompare(String(vb), "vi") * dir;
+  });
+}
+
+function renderHistoryTable(rows) {
+  const tbody = document.getElementById("detailTableBody");
+  if (!tbody) return;
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="6">Không có dữ liệu trong khoảng thời gian này.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  rows.forEach((r) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.time }));
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.date }));
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.salinity == null ? "--" : r.salinity.toFixed(1) }));
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.ph == null ? "--" : r.ph.toFixed(2) }));
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.temperature == null ? "--" : r.temperature.toFixed(1) }));
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.battery == null ? "--" : r.battery.toFixed(0) }));
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadHistoryTable(deviceId, rangeSec) {
+  const hint = document.getElementById("tableHint");
+  if (hint) hint.textContent = "Đang tải...";
+
+  const cacheKey = `${deviceId}:${rangeSec}`;
+  let normalized = historyCache.get(cacheKey);
+
+  if (!normalized) {
+    const { rows, mode } = await fetchDeviceSeries(deviceId, Number(rangeSec), {
+      preferHourly: Number(rangeSec) >= 86400,
+    });
+
+    normalized = normalizeSeriesRows(rows);
+    historyCache.set(cacheKey, normalized);
+
+    if (hint) hint.textContent = `Nguồn: ${mode} • records=${normalized.length}`;
+  } else {
+    if (hint) hint.textContent = `Cache • records=${normalized.length}`;
+  }
+
+  const { key, order } = currentSort;
+  const sorted = sortRows(normalized, key, order);
+  renderHistoryTable(sorted);
+  setSortIndicator(key, order);
+}
+
+function bindSortEvents() {
+  const table = document.getElementById("detailDataTable");
+  if (!table) return;
+
+  table.querySelectorAll("th.sortable").forEach((th) => {
+    th.addEventListener("click", async () => {
+      const key = th.getAttribute("data-key");
+      if (!key) return;
+
+      // toggle
+      if (currentSort.key === key) {
+        currentSort.order = currentSort.order === "asc" ? "desc" : "asc";
+      } else {
+        currentSort.key = key;
+        currentSort.order = "asc";
+      }
+
+      const deviceId = $("detailDeviceSelect")?.value || "";
+      const rangeSec = Number($("detailRange")?.value || "86400");
+      await loadHistoryTable(deviceId, rangeSec);
+    });
+  });
+}
+
 
 async function listDeviceIds() {
   const q1 = query(collection(db, "devices"), limit(200));
@@ -165,10 +343,12 @@ async function reloadDetail() {
 
   // ✅ render chart using charts.js (FIX MẤT BIỂU ĐỒ)
   await renderDeviceDetailChart(deviceId, rangeSec);
+  await loadHistoryTable(deviceId, rangeSec);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   await populateDeviceSelect();
+  bindSortEvents();
 
   $("detailDeviceSelect")?.addEventListener("change", reloadDetail);
   $("detailRange")?.addEventListener("change", reloadDetail);
