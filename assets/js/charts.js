@@ -20,6 +20,31 @@ function epochSecNow() {
   return Math.floor(Date.now() / 1000);
 }
 
+function fmtLabelByRange(dateObj, rangeSec) {
+  if (!dateObj) return "";
+
+  const d = dateObj?.toDate ? dateObj.toDate() : dateObj;
+
+  // 24h (hoặc <= 2 ngày) -> giờ:phút
+  if (rangeSec <= 2 * 86400) {
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+  }
+
+  // <= 45 ngày -> ngày/tháng
+  if (rangeSec <= 45 * 86400) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}/${mm}`;
+  }
+
+  // > 45 ngày -> tháng/năm
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${mm}/${yyyy}`;
+}
+
 // align window (lag 1 bucket như file A)
 function alignedWindow(nowSec, rangeSec, bucketSec, lagBuckets = 1) {
   const alignedEnd = Math.floor(nowSec / bucketSec) * bucketSec - (lagBuckets * bucketSec);
@@ -154,7 +179,7 @@ export async function renderIndexMainChart(deviceId) {
 
   const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
   const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
-  const labels = tArr.map(t => fmtHM(t));
+  const labels = tArr.map(t => fmtLabelByRange(t, rangeSec));
 
   const sal = slim.map(r => safeNum(r.avgSalinity ?? r.salinity ?? null, null));
   const temp = slim.map(r => safeNum(r.avgTemperature ?? r.temperature ?? null, null));
@@ -203,7 +228,7 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
 
   const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
   const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
-  const labels = tArr.map(t => fmtHM(t));
+  const labels = tArr.map(t => fmtLabelByRange(t, safeRangeSec));
 
   const sal = slim.map(r => safeNum(r.avgSalinity ?? r.salinity ?? null, null));
   const temp = slim.map(r => safeNum(r.avgTemperature ?? r.temperature ?? null, null));
