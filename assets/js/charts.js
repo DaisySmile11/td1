@@ -15,6 +15,7 @@ const MAX_PLOT_POINTS = 360;
 
 const BUCKET_5M = 300;
 const BUCKET_1H = 3600;
+const BUCKET_1D = 86400;
 
 function epochSecNow() {
   return Math.floor(Date.now() / 1000);
@@ -87,7 +88,8 @@ function yesterdayWindowSec() {
 
 async function fetchSeries(deviceId, rangeSec, opts = {}) {
   const nowSec = opts.endSec ?? epochSecNow();
-  const useHourly = opts.preferHourly || rangeSec >= 86400;
+  const forced = opts.source ?? null;
+  const useHourly = forced === "hourly" ? true : (forced === "5m") ? false : (opts.preferHourly ?? (rangeSec >= 86400));
 
   if (useHourly) {
     // hourly aligned
@@ -105,6 +107,9 @@ async function fetchSeries(deviceId, rangeSec, opts = {}) {
     const snap = await getDocs(qH);
     return { rows: snap.docs.map(d => d.data()), mode: "hourly" };
   }
+
+  // NOTE: stats_daily removed per config; use stats_hourly for long ranges.
+
 
   // 5m aligned
   const { startSec, endSec } = alignedWindow(nowSec, rangeSec, BUCKET_5M, 1);
@@ -182,30 +187,25 @@ export async function renderIndexMainChart(deviceId) {
   if (!canvas) return;
 
   const timeSel = document.getElementById("timeRange");
-  const rangeKey = timeSel?.value ?? "day";
+  const rangeKey = timeSel?.value ?? "last24h";
 
-  // rangeSec + endSec cho yesterday
+  // range config
   let rangeSec = 86400;
-  let endSec = null;
-  let preferHourly = false;
+  let source = "hourly"; // hourly | daily | 5m
 
-  if (rangeKey === "yesterday") {
-    const w = yesterdayWindowSec();
-    rangeSec = 86400;
-    endSec = w.endSec; // cố định end = 00:00 hôm nay
-    preferHourly = false;
-  } else if (rangeKey === "month") {
+  if (rangeKey === "last30d") {
     rangeSec = 30 * 86400;
-    preferHourly = true;
-  } else if (rangeKey === "year") {
-    rangeSec = 365 * 86400;
-    preferHourly = true;
+    source = "hourly";
+  } else if (rangeKey === "last7d") {
+    rangeSec = 7 * 86400;
+    source = "hourly";
   } else {
+    // last24h (default)
     rangeSec = 24 * 3600;
-    preferHourly = false;
+    source = "hourly";
   }
 
-  const { rows, mode } = await fetchSeries(deviceId, rangeSec, { preferHourly, endSec });
+  const { rows, mode } = await fetchSeries(deviceId, rangeSec, { source });
 
   const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
   const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
@@ -252,10 +252,17 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
   const rs = Number(rangeSec);
   const safeRangeSec = Number.isFinite(rs) ? rs : 86400;
 
-  // >= 24h dùng hourly để nhẹ; <24h dùng 5m
-  const preferHourly = safeRangeSec >= 86400;
+  // <24h dùng 5m; 24h dùng hourly; 7d & 30d dùng daily
+  let source = null;
+  if (safeRangeSec === 7 * 86400 || safeRangeSec === 30 * 86400) {
+    source = "hourly";
+  } else if (safeRangeSec >= 86400) {
+    source = "hourly";
+  } else {
+    source = "5m";
+  }
 
-  const { rows, mode } = await fetchSeries(deviceId, safeRangeSec, { preferHourly });
+  const { rows, mode } = await fetchSeries(deviceId, safeRangeSec, { source });
 
   const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
   const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));

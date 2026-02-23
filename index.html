@@ -15,14 +15,16 @@
 </head>
 <body>
 <header class="main-header">
+<div class="header-left">
 <div class="logo">Giám sát độ mặn</div>
-<button class="nav-toggle">☰</button>
 <nav class="main-nav">
 <a class="active" href="index.html">Trang chủ</a>
 <a href="devices.html">Danh sách thiết bị</a>
-<a href="baocao.html">Báo cáo &amp; lịch sử</a>
+<a href="admin.html">Admin</a>
 </nav>
-<button class="btn-link" id="adminBtn" type="button">Admin</button></header>
+</div>
+<button class="nav-toggle" aria-label="Menu">☰</button>
+</header>
 <!-- ===== ALERT BARS (4 loại) ===== -->
 <div class="alert red" id="alertSalinity"></div>
 <div class="alert purple" id="alertPh"></div>
@@ -51,10 +53,9 @@
 <label for="timeRange">Khoảng thời gian:</label>
 <div class="select-wrapper">
 <select id="timeRange">
-<option value="day">Hôm nay</option>
-<option value="yesterday">Hôm qua</option>
-<option value="month">Tháng này</option>
-<option value="year">Năm nay</option>
+<option value="last24h" selected>Last 24h</option>
+<option value="last7d">Last 7d</option>
+<option value="last30d">Last 30d</option>
 </select>
 <span class="select-arrow">▼</span>
 </div>

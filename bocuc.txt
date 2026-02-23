@@ -2,7 +2,6 @@ salinity-dashboard/
 ├─ index.html               (Trang chủ – dashboard + bản đồ)
 ├─ devices.html             
 ├─ device.html             
-├─ baocao.html              (Trang báo cáo / lịch sử theo ngày/tháng/năm)
 ├─ assets/
 │  ├─ css/
 │  │   └─ styles.css

@@ -48,6 +48,12 @@ body {
   letter-spacing: 0.02em;
 }
 
+.header-left{
+  display:flex;
+  align-items:center;
+  gap: 1rem;
+}
+
 .main-nav a {
   color: #e5e7eb;
   text-decoration: none;
@@ -809,4 +815,100 @@ th.sortable[data-order="desc"]::after{
   content: " ▼";
   font-size: 0.75em;
   color: var(--text-muted);
+}
+
+/* =========================
+   Admin login (centered)
+   ========================= */
+body.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.admin-login-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-login-card {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  text-align: center;
+}
+
+.admin-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.admin-favicon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.admin-title {
+  margin: 6px 0 18px;
+  font-size: 22px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-field {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-field label {
+  font-weight: 600;
+}
+
+.admin-field input {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.12);
+  outline: none;
+}
+
+.admin-submit {
+  width: 100%;
+  max-width: 360px;
+  margin: 6px auto 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-msg,
+.admin-status {
+  font-size: 14px;
+  opacity: .85;
+}
+
+.admin-logout {
+  width: 100%;
+  max-width: 360px;
+  margin: 4px auto 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: transparent;
+  cursor: pointer;
 }

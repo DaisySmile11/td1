@@ -66,6 +66,20 @@ function normalizeSeriesRows(rows = []) {
       const sal = safeNum(r.avgSalinity ?? r.salinity ?? null, null);
       const ph = safeNum(r.avgPh ?? r.ph ?? null, null);
       const temp = safeNum(r.avgTemperature ?? r.temperature ?? null, null);
+      // Voltage field in Firestore is batteryVolt (per user spec)
+      const voltCandidate = (
+        r.avgBatteryVolt ??
+        r.batteryVolt ??
+        r.batteryVoltAvg ??
+        r.avgBatteryVoltage ??
+        r.batteryVoltage ??
+        r.avgVoltage ??
+        r.voltage ??
+        null
+      );
+      let volt = safeNum(voltCandidate, null);
+      // Nếu nguồn aggregate không có volt và trả về 0, coi như thiếu dữ liệu (tránh hiển thị 0.00 gây hiểu lầm)
+      if (volt === 0 && voltCandidate == null) volt = null;
       const bat = safeNum(r.avgBatteryPct ?? r.batteryPct ?? null, null);
 
       return {
@@ -75,6 +89,7 @@ function normalizeSeriesRows(rows = []) {
         salinity: sal,
         ph,
         temperature: temp,
+        voltage: volt,
         battery: bat,
       };
     })
@@ -108,6 +123,8 @@ function sortRows(rows, key, order) {
         return r.ph ?? Number.NEGATIVE_INFINITY;
       case "colTemp":
         return r.temperature ?? Number.NEGATIVE_INFINITY;
+      case "colVolt":
+        return r.voltage ?? Number.NEGATIVE_INFINITY;
       case "colBat":
         return r.battery ?? Number.NEGATIVE_INFINITY;
       default:
@@ -132,7 +149,7 @@ function renderHistoryTable(rows) {
   if (!tbody) return;
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="6">Không có dữ liệu trong khoảng thời gian này.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7">Không có dữ liệu trong khoảng thời gian này.</td></tr>`;
     return;
   }
 
@@ -144,6 +161,7 @@ function renderHistoryTable(rows) {
     tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.salinity == null ? "--" : r.salinity.toFixed(1) }));
     tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.ph == null ? "--" : r.ph.toFixed(2) }));
     tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.temperature == null ? "--" : r.temperature.toFixed(1) }));
+    tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.voltage == null ? "--" : r.voltage.toFixed(2) }));
     tr.appendChild(Object.assign(document.createElement("td"), { textContent: r.battery == null ? "--" : r.battery.toFixed(0) }));
     tbody.appendChild(tr);
   });
@@ -158,13 +176,15 @@ async function loadHistoryTable(deviceId, rangeSec) {
 
   if (!normalized) {
     const { rows, mode } = await fetchDeviceSeries(deviceId, Number(rangeSec), {
-      preferHourly: Number(rangeSec) >= 86400,
+      preferHourly: false,
     });
 
     normalized = normalizeSeriesRows(rows);
+    // Giới hạn tối đa 500 dòng (lấy 500 bản ghi mới nhất)
+    if (normalized.length > 500) normalized = normalized.slice(-500);
     historyCache.set(cacheKey, normalized);
 
-    if (hint) hint.textContent = `Nguồn: ${mode} • records=${normalized.length}`;
+    if (hint) hint.textContent = `Nguồn: ${mode} • records=${normalized.length} (max 500)`;
   } else {
     if (hint) hint.textContent = `Cache • records=${normalized.length}`;
   }
