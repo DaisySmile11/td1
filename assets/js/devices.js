@@ -54,7 +54,7 @@ const THRESHOLDS = {
   BAT_LOW: 20,
   BAT_ALERT: 10,
 
-  OFFLINE_AFTER_SEC: 3 * 60 * 60,
+  OFFLINE_AFTER_SEC:  6 * 60,
 };
 
 // =====================
