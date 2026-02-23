@@ -83,8 +83,6 @@ const DEVICE_META = {
 };
 
 
-
-
 function prettifyId(id) {
   return String(id || "")
     .replaceAll("_", " ")
