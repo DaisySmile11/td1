@@ -124,6 +124,7 @@ async function fetchAllLatest() {
 // =====================
 // KPI + System Status
 // =====================
+
 async function updateKpisForSelected(deviceId) {
   const latest = latestMap.get(deviceId) ?? (await readLatest(deviceId));
 
@@ -132,13 +133,21 @@ async function updateKpisForSelected(deviceId) {
   const phEl = $("kpiPh");
   const batEl = $("kpiBattery");
 
-  const salNote = $("kpiSalinityNote");
-  const tempNote = $("kpiTemperatureNote");
-  const phNote = $("kpiPhNote");
-  const batNote = $("kpiBatteryNote");
+  const salNote = $("kpiSalinityNote");     // ✅ giữ lại
+  const tempNote = $("kpiTemperatureNote"); // ❌ bỏ
+  const phNote = $("kpiPhNote");            // ❌ bỏ
+  const batNote = $("kpiBatteryNote");      // ❌ bỏ
 
-  const statusEl = $("kpiStatus");
-  const statusNoteEl = $("kpiStatusNote");
+  const statusEl = $("kpiStatus");          // ✅ hiển thị trạng thái thật
+  const statusNoteEl = $("kpiStatusNote");  // ❌ bỏ dòng nhỏ dưới trạng thái
+
+  // Helper: clear small notes except salinity
+  const clearSmallNotes = () => {
+    if (tempNote) tempNote.textContent = "";
+    if (phNote) phNote.textContent = "";
+    if (batNote) batNote.textContent = "";
+    if (statusNoteEl) statusNoteEl.textContent = "";
+  };
 
   if (!latest) {
     if (salEl) salEl.textContent = "-- ‰";
@@ -147,12 +156,9 @@ async function updateKpisForSelected(deviceId) {
     if (batEl) batEl.textContent = "-- %";
 
     if (salNote) salNote.textContent = "Chưa có dữ liệu.";
-    if (tempNote) tempNote.textContent = "Chưa có dữ liệu.";
-    if (phNote) phNote.textContent = "Chưa có dữ liệu.";
-    if (batNote) batNote.textContent = "Chưa có dữ liệu.";
+    clearSmallNotes();
 
     if (statusEl) statusEl.textContent = "--";
-    if (statusNoteEl) statusNoteEl.textContent = "Chưa có dữ liệu latest.";
     return;
   }
 
@@ -163,53 +169,57 @@ async function updateKpisForSelected(deviceId) {
 
   const updated = fmtDateTime(latest.updatedAt ?? latest.measuredAt ?? null);
 
+  // KPI values
   if (salEl) salEl.textContent = sal == null ? "-- ‰" : `${sal.toFixed(1)} ‰`;
   if (tempEl) tempEl.textContent = temp == null ? "-- °C" : `${temp.toFixed(1)} °C`;
   if (phEl) phEl.textContent = ph == null ? "--" : `${ph.toFixed(2)}`;
   if (batEl) batEl.textContent = bat == null ? "-- %" : `${bat.toFixed(0)} %`;
 
+  // ✅ Chỉ giữ dòng nhỏ ở ô Độ mặn
   if (salNote) salNote.textContent = `Cập nhật: ${updated}`;
-  if (tempNote) tempNote.textContent = `Cập nhật: ${updated}`;
-  if (phNote) phNote.textContent = `Cập nhật: ${updated}`;
-  if (batNote) batNote.textContent = `Cập nhật: ${updated}`;
 
-  if (!statusEl || !statusNoteEl) return;
+  // ❌ Xóa dòng nhỏ ở Nhiệt độ / pH / Pin / Trạng thái
+  clearSmallNotes();
 
+  // ==========================
+  // Trạng thái hệ thống "thật"
+  // ==========================
+  if (!statusEl) return;
+
+  // Offline ưu tiên
   if (isOfflineFromLatest(latest, THRESHOLDS.OFFLINE_MINUTES)) {
-    statusEl.textContent = "Thiết bị offline";
-    statusNoteEl.textContent = `Mất kết nối / không cập nhật > ${THRESHOLDS.OFFLINE_MINUTES} phút.`;
+    statusEl.textContent = "Offline";
     return;
   }
 
-  const notes = [];
+  const statuses = [];
 
-  if (sal != null && (sal > THRESHOLDS.SAL_HIGH || sal < THRESHOLDS.SAL_LOW)) {
-    statusEl.textContent = "Cảnh báo ALERT";
-    notes.push(`Độ mặn ngoài [${THRESHOLDS.SAL_LOW}..${THRESHOLDS.SAL_HIGH}]‰.`);
+  // Độ mặn
+  if (sal != null) {
+    if (sal > THRESHOLDS.SAL_HIGH) statuses.push("Độ mặn cao");
+    else if (sal < THRESHOLDS.SAL_LOW) statuses.push("Độ mặn thấp");
   }
 
-  if (ph != null && (ph > THRESHOLDS.PH_HIGH || ph < THRESHOLDS.PH_LOW)) {
-    statusEl.textContent = "Cảnh báo ALERT";
-    notes.push(`pH ngoài [${THRESHOLDS.PH_LOW}..${THRESHOLDS.PH_HIGH}].`);
+  // pH
+  if (ph != null) {
+    if (ph > THRESHOLDS.PH_HIGH) statuses.push("pH cao");
+    else if (ph < THRESHOLDS.PH_LOW) statuses.push("pH thấp");
   }
 
-  if (temp != null && (temp > THRESHOLDS.TEMP_HIGH || temp < THRESHOLDS.TEMP_LOW)) {
-    statusEl.textContent = "Cảnh báo WARN";
-    notes.push(`Nhiệt độ ngoài [${THRESHOLDS.TEMP_LOW}..${THRESHOLDS.TEMP_HIGH}]°C.`);
+  // Nhiệt độ
+  if (temp != null) {
+    if (temp > THRESHOLDS.TEMP_HIGH) statuses.push("Nhiệt độ cao");
+    else if (temp < THRESHOLDS.TEMP_LOW) statuses.push("Nhiệt độ thấp");
   }
 
-  if (bat != null && bat < THRESHOLDS.BAT_LOW) {
-    statusEl.textContent = "Cảnh báo WARN";
-    notes.push(`Pin < ${THRESHOLDS.BAT_LOW}%.`);
-  }
+  // Pin
+  if (bat != null && bat < THRESHOLDS.BAT_LOW) statuses.push("Pin yếu");
 
-  if (!notes.length) {
-    statusEl.textContent = "Thiết bị hoạt động ổn định";
-    statusNoteEl.textContent = "Mọi chỉ số nằm trong ngưỡng.";
-  } else {
-    statusNoteEl.textContent = notes.join(" ");
-  }
+  // Nếu không có cảnh báo nào
+  statusEl.textContent = statuses.length ? statuses.join(" • ") : "Bình thường";
 }
+
+
 
 // =====================
 // Alert helpers (✅ TOP-LEVEL để không bị mất scope)
