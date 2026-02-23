@@ -62,7 +62,7 @@ const THRESHOLDS = {
   BAT_ALERT: 10,
 
   // Offline: nếu updated/measured quá lâu
-  OFFLINE_AFTER_SEC: 10 * 60, // 3 giờ
+  OFFLINE_AFTER_SEC: 10 * 60, // 10 phút
 };
 
 // =====================
@@ -75,11 +75,15 @@ const DEVICE_META = {
   HoChiMinh_city: { name: "Hồ Chí Minh", lat: 10.8231, lng: 106.6297 },
 
   // demo (tạm)
-  //demo_1: { name: "demo_1", lat: 10.8231, lng: 106.6297 },
-  //demo_2: { name: "demo_2", lat: 10.9574, lng: 106.8427 },
-  //demo_wifi_1: { name: "demo_wifi_1", lat: 11.3254, lng: 106.4770 },
-  //demo_wifi_2: { name: "demo_wifi_2", lat: 10.8231, lng: 106.6297 },
+  demo_1: { name: "Demo Long Xuyên", lat: 10.391895, lng: 105.431071 },
+  demo_2: { name: "Demo Cần Thơ", lat: 10.066987, lng: 105.777952 },
+  demo_wifi_1: { name: "Demo Bạc Liêu", lat: 9.207590, lng: 105.741604 },
+  demo_wifi_2: { name: "Demo Rạch Giá", lat: 10.009880, lng: 105.070804 },
+
 };
+
+
+
 
 function prettifyId(id) {
   return String(id || "")
