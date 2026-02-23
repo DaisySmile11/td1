@@ -54,7 +54,7 @@ const THRESHOLDS = {
   BAT_LOW: 20,
   BAT_ALERT: 10,
 
-  OFFLINE_AFTER_SEC: 3 * 60 * 60,
+  OFFLINE_AFTER_SEC: 10 * 60,
 };
 
 // =====================
@@ -66,10 +66,10 @@ const DEVICE_META = {
   binh_duong: { name: "Bình Dương", location: "Bình Dương" },
   HoChiMinh_city: { name: "Hồ Chí Minh", location: "TP. Hồ Chí Minh" },
 
-  demo_1: { name: "demo_1", location: "—" },
-  demo_2: { name: "demo_2", location: "—" },
-  demo_wifi_1: { name: "demo_wifi_1", location: "—" },
-  demo_wifi_2: { name: "demo_wifi_2", location: "—" },
+  demo_1: { name: "Demo Long Xuyên", location: "Long Xuyên, An Giang" },
+  demo_2: { name: "Demo Cần Thơ", location: "Cần Thơ" },
+  demo_wifi_1: { name: "Demo Bạc Liêu", location: "Bạc Liêu" },
+  demo_wifi_2: { name: "Demo Rạch Giá", location: "Rạch Giá, Kiên Giang" },
 };
 
 function prettifyId(id) {

@@ -62,12 +62,12 @@ const THRESHOLDS = {
   BAT_ALERT: 10,
 
   // Offline: nếu updated/measured quá lâu
-  OFFLINE_AFTER_SEC: 3 * 60 * 60, // 3 giờ
+  OFFLINE_AFTER_SEC: 10 * 60, // 3 giờ
 };
 
 // =====================
 // Device display name + lat/lng mapping
-// 👉 chỗ bạn đổi tên & vị trí thiết bị
+// 👉 chỗ đổi tên & vị trí thiết bị
 // =====================
 const DEVICE_META = {
   bien_hoa: { name: "Biên Hòa", lat: 10.9574, lng: 106.8427 },
@@ -75,10 +75,10 @@ const DEVICE_META = {
   HoChiMinh_city: { name: "Hồ Chí Minh", lat: 10.8231, lng: 106.6297 },
 
   // demo (tạm)
-  demo_1: { name: "demo_1", lat: 10.8231, lng: 106.6297 },
-  demo_2: { name: "demo_2", lat: 10.9574, lng: 106.8427 },
-  demo_wifi_1: { name: "demo_wifi_1", lat: 11.3254, lng: 106.4770 },
-  demo_wifi_2: { name: "demo_wifi_2", lat: 10.8231, lng: 106.6297 },
+  //demo_1: { name: "demo_1", lat: 10.8231, lng: 106.6297 },
+  //demo_2: { name: "demo_2", lat: 10.9574, lng: 106.8427 },
+  //demo_wifi_1: { name: "demo_wifi_1", lat: 11.3254, lng: 106.4770 },
+  //demo_wifi_2: { name: "demo_wifi_2", lat: 10.8231, lng: 106.6297 },
 };
 
 function prettifyId(id) {

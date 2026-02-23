@@ -29,10 +29,16 @@ export const DEVICE_OVERRIDES = {
   binh_duong: { name: "Bình Dương", lat: 11.3254, lng: 106.4770 },
   HoChiMinh_city: { name: "Hồ Chí Minh", lat: 10.8231, lng: 106.6297 },
   // ví dụ thêm:
-  // can_tho: { name: "Cần Thơ", lat: 10.0452, lng: 105.7469 },
+  demo_1: { name: "Demo Long Xuyên", lat: 10.391895, lng: 105.431071 },
+  demo_2: { name: "Demo Cần Thơ", lat: 10.066987, lng: 105.777952 },
+  demo_wifi_1: { name: "Demo Bạc Liêu", lat: 9.207590, lng: 105.741604 },
+  demo_wifi_2: { name: "Demo Rạch Giá", lat: 10.009880, lng: 105.070804 },
 };
 
 export const THRESHOLDS = {
+  // Offline
+  OFFLINE_MINUTES: 10, // 10 phút không gửi tín hiệu sẽ báo offline
+
   // Độ mặn (‰)
   SAL_WARN: 30,
   SAL_DANGER: 35,
@@ -48,8 +54,6 @@ export const THRESHOLDS = {
   PH_LOW: 6.5,
   PH_HIGH: 8.5,
 
-  // Offline
-  OFFLINE_MINUTES: 180, // 3 giờ
 };
 
 // Helpers
