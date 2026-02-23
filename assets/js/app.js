@@ -80,6 +80,7 @@ const DEVICE_META = {
   demo_wifi_1: { name: "Demo Bạc Liêu", lat: 9.207590, lng: 105.741604 },
   demo_wifi_2: { name: "Demo Rạch Giá", lat: 10.009880, lng: 105.070804 },
 
+
 };
 
 
