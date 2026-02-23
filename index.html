@@ -5,6 +5,8 @@
   <title>Giám sát độ mặn - Trang chủ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/favicon.png" type="image/png" />
+<link rel="shortcut icon" href="assets/favicon.png" type="image/png" />
 
   <!-- Leaflet cho bản đồ -->
   <link
@@ -24,34 +26,22 @@
 </head>
 <body>
   <header class="main-header">
-    <div class="logo">Giám sát độ mặn</div>
-    <nav class="main-nav">
-      <a href="index.html" class="active">Trang chủ</a>
-      <a href="devices.html">Danh sách thiết bị</a>
-      <a href="baocao.html">Báo cáo & lịch sử</a>
-    </nav>
-  </header>
+  <div class="logo">Giám sát độ mặn</div>
 
-<!-- ===== ALERT BARS (5 loại) ===== -->
-  <div id="alertBarSalinity" class="alert-bar alert-bar-salinity" style="display:none;">
-    <ul class="alert-list alert-list-inline" id="alertListSalinity"></ul>
-  </div>
+  <button class="nav-toggle">☰</button>
 
-  <div id="alertBarPh" class="alert-bar alert-bar-ph" style="display:none;">
-    <ul class="alert-list alert-list-inline" id="alertListPh"></ul>
-  </div>
+  <nav class="main-nav">
+    <a href="index.html" class="active">Trang chủ</a>
+    <a href="devices.html">Danh sách thiết bị</a>
+    <a href="baocao.html">Báo cáo & lịch sử</a>
+  </nav>
+</header>
 
-  <div id="alertBarTemp" class="alert-bar alert-bar-temp" style="display:none;">
-    <ul class="alert-list alert-list-inline" id="alertListTemp"></ul>
-  </div>
-
-  <div id="alertBarBattery" class="alert-bar alert-bar-battery" style="display:none;">
-    <ul class="alert-list alert-list-inline" id="alertListBattery"></ul>
-  </div>
-
-  <div id="alertBarOffline" class="alert-bar alert-bar-offline" style="display:none;">
-    <ul class="alert-list alert-list-inline" id="alertListOffline"></ul>
-  </div>
+<!-- ===== ALERT BARS (4 loại) ===== -->
+<div class="alert red" id="alertSalinity"></div>
+<div class="alert purple" id="alertPh"></div>
+<div class="alert yellow" id="alertBattery"></div>
+<div class="alert gray" id="alertOffline"></div>
 
   <main class="container">
     <section class="section">
@@ -147,20 +137,16 @@
           <h2>Bản đồ thiết bị (Việt Nam)</h2>
         </div>
         <div id="map" class="map-container"></div>
-        <div class="legend">
-          <span class="legend-item">
-            <span class="legend-dot legend-active"></span> Active
-          </span>
-          <span class="legend-item">
-            <span class="legend-dot legend-highsal"></span> Độ mặn cao / pH / nhiệt độ
-          </span>
-          <span class="legend-item">
-            <span class="legend-dot legend-lowbat"></span> Pin yếu
-          </span>
-          <span class="legend-item">
-            <span class="legend-dot legend-offline"></span> Offline
-          </span>
-        </div>
+
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-dot legend-active"></span> Active</span>
+  <span class="legend-item"><span class="legend-dot legend-highsal"></span> Độ mặn bất thường</span>
+  <span class="legend-item"><span class="legend-dot legend-lowbat"></span> Pin yếu</span>
+  <span class="legend-item"><span class="legend-dot legend-offline"></span> Offline</span>
+</div>
+
+
       </div>
     </section>
   </main>
@@ -174,5 +160,6 @@
   <script type="module" src="assets/js/charts.js"></script>
   <script type="module" src="assets/js/map.js"></script>
   <script type="module" src="assets/js/app.js"></script>
+  <script src="assets/js/nav.js"></script>
 </body>
 </html>

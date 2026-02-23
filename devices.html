@@ -5,16 +5,21 @@
   <title>Danh sách thiết bị - Giám sát độ mặn</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+ <link rel="icon" href="assets/favicon.png" type="image/png" />
+<link rel="shortcut icon" href="assets/favicon.png" type="image/png" />
 </head>
 <body>
   <header class="main-header">
-    <div class="logo">Giám sát độ mặn</div>
-    <nav class="main-nav">
-      <a href="index.html">Trang chủ</a>
-      <a href="devices.html" class="active">Danh sách thiết bị</a>
-      <a href="baocao.html">Báo cáo & lịch sử</a>
-    </nav>
-  </header>
+  <div class="logo">Giám sát độ mặn</div>
+
+  <button class="nav-toggle">☰</button>
+
+  <nav class="main-nav">
+    <a href="index.html" class="active">Trang chủ</a>
+    <a href="devices.html">Danh sách thiết bị</a>
+    <a href="baocao.html">Báo cáo & lịch sử</a>
+  </nav>
+</header>
 
   <main class="container">
     <section class="section">
@@ -56,5 +61,6 @@
 
   <!-- ✅ chỉ load devices.js -->
   <script type="module" src="assets/js/devices.js"></script>
+  <script src="assets/js/nav.js"></script>
 </body>
 </html>

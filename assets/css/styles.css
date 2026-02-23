@@ -593,3 +593,196 @@ body {
   height: 320px !important;  /* bạn đổi 280/320/360 tùy ý */
   display: block;
 }
+
+/* ===== Navbar mobile ===== */
+.nav-toggle {
+  display: none;
+  border: none;
+  background: #1e293b;
+  color: white;
+  font-size: 1.2rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .nav-toggle {
+    display: inline-block;
+  }
+
+  .main-nav {
+    display: none;
+    flex-direction: column;
+    background: #0f172a;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .main-nav.open {
+    display: flex;
+  }
+
+  .main-nav a {
+    margin: 6px 0;
+  }
+}
+
+/* =========================
+   ALERT (4 dòng theo loại)
+   ========================= */
+.alert{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Độ mặn - đỏ */
+.alert.red{
+  background-color: #b91c1c;
+  color: #fee2e2;
+}
+
+/* pH - tím */
+.alert.purple{
+  background-color: #7c3aed;
+  color: #ede9fe;
+}
+
+/* Pin - vàng */
+.alert.yellow{
+  background-color: #facc15;
+  color: #78350f;
+}
+
+/* Offline - xám */
+.alert.gray{
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+/* mobile: giảm padding cho gọn */
+@media (max-width: 900px){
+  .alert{
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* =========================
+   ALERT BAR (4 dòng theo loại) - LIGHT COLORS + TAG PILL
+   ========================= */
+
+.alert {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* Tag pill giống badge Offline */
+.alert .alert-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.2px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  white-space: nowrap;
+}
+
+.alert .alert-msg {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Link tên thiết bị theo màu từng dòng */
+.alert .alert-link {
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+  color: inherit; /* lấy đúng màu của dòng */
+}
+
+.alert .alert-link:hover {
+  opacity: 0.75;
+}
+
+/* ==== LIGHT THEMES ==== */
+
+/* Độ mặn - đỏ nhạt */
+.alert.red {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+.alert.red .alert-tag {
+  background: #ffffff;
+  color: #7f1d1d;
+  border-color: rgba(127, 29, 29, 0.25);
+}
+
+/* pH - tím nhạt */
+.alert.purple {
+  background: #ede9fe;
+  color: #4c1d95;
+}
+.alert.purple .alert-tag {
+  background: #ffffff;
+  color: #4c1d95;
+  border-color: rgba(76, 29, 149, 0.25);
+}
+
+/* Pin - vàng nhạt */
+.alert.yellow {
+  background: #fef9c3;
+  color: #854d0e;
+}
+.alert.yellow .alert-tag {
+  background: #ffffff;
+  color: #854d0e;
+  border-color: rgba(133, 77, 14, 0.25);
+}
+
+/* Offline - xám nhạt */
+.alert.gray {
+  background: #f3f4f6;
+  color: #111827;
+}
+.alert.gray .alert-tag {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(17, 24, 39, 0.2);
+}
+
+/* Mobile: gọn hơn */
+@media (max-width: 900px) {
+  .alert {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.88rem;
+    gap: 0.6rem;
+  }
+  .alert .alert-tag {
+    font-size: 0.78rem;
+    padding: 0.18rem 0.52rem;
+  }
+}
+
+.legend-dot{ width:10px; height:10px; border-radius:999px; display:inline-block; margin-right:6px; }
+.legend-active{ background:#16a34a; }
+.legend-highsal{ background:#dc2626; }
+.legend-lowbat{ background:#facc15; }
+.legend-offline{ background:#6b7280; }

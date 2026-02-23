@@ -29,11 +29,11 @@ function clearMarkers() {
   deviceMarkers = [];
 }
 
-// simple status color (can improve later)
 function getMarkerColor(device) {
-  // if app.js later fills battery/salinity/temp, you can color here
-  // fallback: red dot
-  return "#dc2626";
+  if (device.offline) return "#6b7280";      // xám
+  if (device.salinity > 30 || device.salinity < 1) return "#dc2626"; // đỏ
+  if (device.battery < 20) return "#facc15"; // vàng
+  return "#16a34a"; // xanh lá
 }
 
 function refreshDeviceMarkers() {
