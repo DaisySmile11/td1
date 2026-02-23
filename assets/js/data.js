@@ -36,9 +36,7 @@ export const DEVICE_OVERRIDES = {
 };
 
 export const THRESHOLDS = {
-  // Offline
-  OFFLINE_MINUTES: 10, // 10 phút không gửi tín hiệu sẽ báo offline
-
+  
   // Độ mặn (‰)
   SAL_WARN: 30,
   SAL_DANGER: 35,
@@ -53,6 +51,9 @@ export const THRESHOLDS = {
   // pH
   PH_LOW: 6.5,
   PH_HIGH: 8.5,
+
+  // Offline
+  OFFLINE_MINUTES: 10, // 10 phút không gửi tín hiệu sẽ báo offline
 
 };
 
