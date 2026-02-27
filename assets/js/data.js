@@ -37,27 +37,17 @@ export const DEVICE_OVERRIDES = {
 
 export const THRESHOLDS = {
   // Độ mặn (‰)
-<<<<<<< HEAD
   // ✅ Ngưỡng: 8‰ - 12‰
   SAL_HIGH: 12,
   SAL_LOW: 8,
-=======
-  SAL_HIGH: 30,
-  SAL_LOW: 1,
->>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   // Pin (%)
   BAT_LOW: 20,
 
   // Nhiệt độ (°C)
-<<<<<<< HEAD
   // ✅ Ngưỡng: 25°C - 32°C
   TEMP_LOW: 25,
   TEMP_HIGH: 32,
-=======
-  TEMP_LOW: 20,
-  TEMP_HIGH: 38,
->>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   // pH
   PH_HIGH: 8.5,
@@ -153,23 +143,14 @@ export function isOfflineFromLatest(latest, offlineMinutes = THRESHOLDS.OFFLINE_
 export function deviceStatus(latest) {
   if (isOfflineFromLatest(latest)) return "offline";
 
-<<<<<<< HEAD
-=======
-  const bat = safeNum(latest?.batteryPct, null);
-  if (bat != null && bat < THRESHOLDS.BAT_LOW) return "low-battery";
-
->>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const sal = safeNum(latest?.salinity, null);
   if (sal != null && (sal > THRESHOLDS.SAL_HIGH || sal < THRESHOLDS.SAL_LOW))
     return "abnormal-salinity";
 
-<<<<<<< HEAD
   const bat = safeNum(latest?.batteryPct, null);
   // ✅ Pin > 20% là bình thường => <= 20% coi là pin yếu
   if (bat != null && bat <= THRESHOLDS.BAT_LOW) return "low-battery";
 
-=======
->>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const temp = safeNum(latest?.temperature, null);
   if (temp != null && (temp < THRESHOLDS.TEMP_LOW || temp > THRESHOLDS.TEMP_HIGH))
     return "warning-temp";

@@ -292,12 +292,8 @@ function buildRealStatus(latest) {
     else if (temp < THRESHOLDS.TEMP_LOW) parts.push("Nhiệt độ thấp");
   }
 
-<<<<<<< HEAD
   // ✅ Pin > 20% là bình thường => <= 20% coi là pin yếu
   if (bat != null && bat <= THRESHOLDS.BAT_LOW) parts.push("Pin yếu");
-=======
-  if (bat != null && bat < THRESHOLDS.BAT_LOW) parts.push("Pin yếu");
->>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   return parts.length ? parts.join(" • ") : "Bình thường";
 }
