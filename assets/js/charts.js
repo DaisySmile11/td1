@@ -8,18 +8,27 @@ import {
   where,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+<<<<<<< HEAD
 import { db, safeNum } from "./data.js";
+=======
+import { db, fmtHM, safeNum } from "./data.js";
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
 const MAX_READ_DOCS = 1400;
 const MAX_PLOT_POINTS = 360;
 
 const BUCKET_5M = 300;
 const BUCKET_1H = 3600;
+<<<<<<< HEAD
+=======
+const BUCKET_1D = 86400;
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
 function epochSecNow() {
   return Math.floor(Date.now() / 1000);
 }
 
+<<<<<<< HEAD
 /** Normalize various timestamp shapes into Date */
 function toDateObj(v) {
   if (!v) return null;
@@ -58,6 +67,15 @@ function fmtLabelByRange(dateObj, rangeSec) {
   if (!d) return "";
 
   // <= 2 ngày -> giờ:phút
+=======
+function fmtLabelByRange(dateObj, rangeSec) {
+
+  if (!dateObj) return "";
+
+  const d = dateObj?.toDate ? dateObj.toDate() : dateObj;
+
+  // 24h (hoặc <= 2 ngày) -> giờ:phút
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   if (rangeSec <= 2 * 86400) {
     const hh = String(d.getHours()).padStart(2, "0");
     const mm = String(d.getMinutes()).padStart(2, "0");
@@ -77,9 +95,17 @@ function fmtLabelByRange(dateObj, rangeSec) {
   return `${mm}/${yyyy}`;
 }
 
+<<<<<<< HEAD
 function fmtTooltipDateTime(v) {
   const d = toDateObj(v);
   if (!d) return "";
+=======
+
+function fmtTooltipDateTime(v) {
+  if (!v) return "";
+  const d = v?.toDate ? v.toDate() : v;
+  // vi-VN dd/mm/yyyy, 24h
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();
@@ -88,7 +114,12 @@ function fmtTooltipDateTime(v) {
   return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
 }
 
+<<<<<<< HEAD
 // align window (lag 1 bucket)
+=======
+
+// align window (lag 1 bucket như file A)
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 function alignedWindow(nowSec, rangeSec, bucketSec, lagBuckets = 1) {
   const alignedEnd = Math.floor(nowSec / bucketSec) * bucketSec - (lagBuckets * bucketSec);
   const alignedStart = alignedEnd - rangeSec + bucketSec;
@@ -104,6 +135,7 @@ function downsampleUniform(rowsAsc, maxPlot) {
   return out;
 }
 
+<<<<<<< HEAD
 /**
  * Fetch series from:
  * - readings (raw) for 5m/15m/30m
@@ -165,6 +197,24 @@ async function fetchSeries(deviceId, rangeSec, opts = {}) {
         : (opts.preferHourly ?? (rangeSec >= 86400));
 
   if (useHourly) {
+=======
+// yesterday window theo local time (VN chạy local ok)
+function yesterdayWindowSec() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0); // start today
+  const endSec = Math.floor(d.getTime() / 1000);
+  const startSec = endSec - 86400;
+  return { startSec, endSec };
+}
+
+async function fetchSeries(deviceId, rangeSec, opts = {}) {
+  const nowSec = opts.endSec ?? epochSecNow();
+  const forced = opts.source ?? null;
+  const useHourly = forced === "hourly" ? true : (forced === "5m") ? false : (opts.preferHourly ?? (rangeSec >= 86400));
+
+  if (useHourly) {
+    // hourly aligned
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
     const { startSec, endSec } = alignedWindow(nowSec, rangeSec, BUCKET_1H, 1);
     const want = Math.min(Math.floor(rangeSec / BUCKET_1H) + 3, MAX_READ_DOCS);
 
@@ -180,7 +230,14 @@ async function fetchSeries(deviceId, rangeSec, opts = {}) {
     return { rows: snap.docs.map(d => d.data()), mode: "hourly" };
   }
 
+<<<<<<< HEAD
   // ===== 5M STATS =====
+=======
+  // NOTE: stats_daily removed per config; use stats_hourly for long ranges.
+
+
+  // 5m aligned
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const { startSec, endSec } = alignedWindow(nowSec, rangeSec, BUCKET_5M, 1);
   const want = Math.min(Math.floor(rangeSec / BUCKET_5M) + 3, MAX_READ_DOCS);
 
@@ -211,6 +268,7 @@ function buildChart(ctx, datasets, times = []) {
             title: (items) => {
               if (!items || !items.length) return "";
               const idx = items[0].dataIndex;
+<<<<<<< HEAD
 
               // Prefer $times (Date objects)
               const t = items[0].chart?.$times?.[idx] ?? null;
@@ -218,17 +276,29 @@ function buildChart(ctx, datasets, times = []) {
 
               // Fallback: label
               return items[0].label ?? "";
+=======
+              const t = items[0].chart?.$times?.[idx] ?? null;
+              return t ? fmtTooltipDateTime(t) : (items[0].label ?? "");
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
             },
           },
         },
       },
       stacked: false,
       scales: {
+<<<<<<< HEAD
+=======
+        // trục trái chỉ độ mặn + nhiệt độ
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
         y: {
           type: "linear",
           position: "left",
           title: { display: true, text: "Độ mặn / Nhiệt độ" },
         },
+<<<<<<< HEAD
+=======
+        // pin
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
         y2: {
           type: "linear",
           position: "right",
@@ -237,6 +307,10 @@ function buildChart(ctx, datasets, times = []) {
           title: { display: true, text: "Pin (%)" },
           grid: { drawOnChartArea: false },
         },
+<<<<<<< HEAD
+=======
+        // pH riêng
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
         y3: {
           type: "linear",
           position: "right",
@@ -248,7 +322,10 @@ function buildChart(ctx, datasets, times = []) {
       },
     },
   });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   c.$times = Array.isArray(times) ? times : [];
   return c;
 }
@@ -261,8 +338,14 @@ export async function renderIndexMainChart(deviceId) {
   const timeSel = document.getElementById("timeRange");
   const rangeKey = timeSel?.value ?? "last24h";
 
+<<<<<<< HEAD
   let rangeSec = 86400;
   let source = "hourly";
+=======
+  // range config
+  let rangeSec = 86400;
+  let source = "hourly"; // hourly | daily | 5m
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   if (rangeKey === "last30d") {
     rangeSec = 30 * 86400;
@@ -271,6 +354,10 @@ export async function renderIndexMainChart(deviceId) {
     rangeSec = 7 * 86400;
     source = "hourly";
   } else {
+<<<<<<< HEAD
+=======
+    // last24h (default)
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
     rangeSec = 24 * 3600;
     source = "hourly";
   }
@@ -278,6 +365,7 @@ export async function renderIndexMainChart(deviceId) {
   const { rows, mode } = await fetchSeries(deviceId, rangeSec, { source });
 
   const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
+<<<<<<< HEAD
 
   const tArr = slim.map(r => {
     // hourly/5m
@@ -286,6 +374,9 @@ export async function renderIndexMainChart(deviceId) {
     return null;
   }).filter(Boolean);
 
+=======
+  const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const labels = tArr.map(t => fmtLabelByRange(t, rangeSec));
 
   const sal = slim.map(r => safeNum(r.avgSalinity ?? r.salinity ?? null, null));
@@ -312,10 +403,23 @@ export async function renderIndexMainChart(deviceId) {
   window.__mainChart.update();
 
   const note = document.querySelector(".note-pill-text");
+<<<<<<< HEAD
   if (note) note.textContent = `Biểu đồ lấy dữ liệu thật từ Firestore (${mode}).`;
 }
 
 // ===== DEVICE DETAIL PAGE =====
+=======
+  if (note) {
+    note.textContent =
+      rangeKey === "yesterday"
+        ? `Biểu đồ: Hôm qua • nguồn: ${mode}`
+        : `Biểu đồ lấy dữ liệu thật từ Firestore (${mode}).`;
+  }
+}
+
+// ===== DEVICE DETAIL PAGE =====
+// rangeSec = số giây (300/900/1800/3600/86400/...)
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 export async function renderDeviceDetailChart(deviceId, rangeSec) {
   const canvas = document.getElementById("detailChart");
   if (!canvas) return;
@@ -323,6 +427,7 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
   const rs = Number(rangeSec);
   const safeRangeSec = Number.isFinite(rs) ? rs : 86400;
 
+<<<<<<< HEAD
   // ✅ 5m / 15m / 30m => readings
   // <24h (trừ 5/15/30) => stats_5m
   // >=24h => stats_hourly
@@ -330,10 +435,22 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
   if (safeRangeSec <= 1800) source = "readings";
   else if (safeRangeSec >= 86400) source = "hourly";
   else source = "5m";
+=======
+  // <24h dùng 5m; 24h dùng hourly; 7d & 30d dùng daily
+  let source = null;
+  if (safeRangeSec === 7 * 86400 || safeRangeSec === 30 * 86400) {
+    source = "hourly";
+  } else if (safeRangeSec >= 86400) {
+    source = "hourly";
+  } else {
+    source = "5m";
+  }
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   const { rows, mode } = await fetchSeries(deviceId, safeRangeSec, { source });
 
   const slim = downsampleUniform(rows, MAX_PLOT_POINTS);
+<<<<<<< HEAD
 
   // Build time array based on mode
   let tArr = [];
@@ -355,6 +472,9 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
     }).filter(Boolean);
   }
 
+=======
+  const tArr = slim.map(r => r.bucketStart || (r.bucketStartSec ? new Date(r.bucketStartSec * 1000) : null));
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const labels = tArr.map(t => fmtLabelByRange(t, safeRangeSec));
 
   const sal = slim.map(r => safeNum(r.avgSalinity ?? r.salinity ?? null, null));
@@ -387,4 +507,8 @@ export async function renderDeviceDetailChart(deviceId, rangeSec) {
 // Public helper for device detail table / exports
 export async function fetchDeviceSeries(deviceId, rangeSec, opts = {}) {
   return await fetchSeries(deviceId, rangeSec, opts);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea

@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 // assets/js/devices.js
 // Devices list page (devices.html)
 // - list devices from Firestore
@@ -36,6 +39,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // =====================
+<<<<<<< HEAD
 // Thresholds (theo yêu cầu đề tài)
 // =====================
 const THRESHOLDS = {
@@ -55,6 +59,27 @@ const THRESHOLDS = {
   BAT_LOW: 20,
 
   // Offline nếu quá 10 phút không cập nhật
+=======
+// Thresholds (same logic as app.js)
+// =====================
+const THRESHOLDS = {
+  SAL_WARN: 30,
+  SAL_ALERT: 35,
+
+  PH_LOW: 6.5,
+  PH_HIGH: 8.5,
+  PH_LOW_ALERT: 6.0,
+  PH_HIGH_ALERT: 9.0,
+
+  TEMP_LOW: 20,
+  TEMP_HIGH: 32,
+  TEMP_LOW_ALERT: 15,
+  TEMP_HIGH_ALERT: 35,
+
+  BAT_LOW: 20,
+  BAT_ALERT: 10,
+
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   OFFLINE_AFTER_SEC: 10 * 60,
 };
 
@@ -94,6 +119,7 @@ function safeNum(v, fallback = null) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+<<<<<<< HEAD
 function pickVoltage(latest) {
   if (!latest) return null;
   const voltCandidate =
@@ -111,6 +137,8 @@ function pickVoltage(latest) {
   return v;
 }
 
+=======
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 function fmtDateTime(v) {
   if (!v) return "--";
   const d = v?.toDate ? v.toDate() : new Date(v);
@@ -138,6 +166,7 @@ function isOffline(latest) {
   return nowSec - base >= THRESHOLDS.OFFLINE_AFTER_SEC;
 }
 
+<<<<<<< HEAD
 function buildStatus(latest) {
   if (!latest) {
     return {
@@ -157,11 +186,38 @@ function buildStatus(latest) {
     };
   }
 
+=======
+function hasAlertOrWarnFromAlertsArray(latest) {
+  const alerts = Array.isArray(latest?.alerts) ? latest.alerts.map(String) : [];
+  let hasAlert = false;
+  let hasWarn = false;
+
+  alerts.forEach((a) => {
+    const s = a.toUpperCase();
+    if (s.includes("ALERT")) hasAlert = true;
+    else if (s.includes("WARN")) hasWarn = true;
+  });
+
+  return { hasAlert, hasWarn };
+}
+
+function classifyStatus(latest) {
+  if (!latest) return { level: "offline", text: "Không có dữ liệu" };
+  if (isOffline(latest)) return { level: "offline", text: "Offline / mất kết nối" };
+
+  // Prefer latest.alerts if exists
+  const { hasAlert, hasWarn } = hasAlertOrWarnFromAlertsArray(latest);
+  if (hasAlert) return { level: "alert", text: "Cảnh báo ALERT" };
+  if (hasWarn) return { level: "warn", text: "Cảnh báo WARN" };
+
+  // Fallback thresholds
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   const sal = safeNum(latest.salinity, null);
   const ph = safeNum(latest.ph, null);
   const temp = safeNum(latest.temperature, null);
   const bat = safeNum(latest.batteryPct, null);
 
+<<<<<<< HEAD
   const parts = [];
   let hasSalinityWarn = false;
   let hasBatteryWarn = false;
@@ -206,6 +262,41 @@ function rowClassFromStatus(st) {
   // - vàng: pin yếu
   if (st.hasSalinityWarn) return "row-danger";
   if (st.hasBatteryWarn) return "row-warning";
+=======
+  let alert = false;
+  let warn = false;
+
+  if (sal != null) {
+    if (sal >= THRESHOLDS.SAL_ALERT) alert = true;
+    else if (sal >= THRESHOLDS.SAL_WARN) warn = true;
+  }
+
+  if (ph != null) {
+    if (ph < THRESHOLDS.PH_LOW_ALERT || ph > THRESHOLDS.PH_HIGH_ALERT) alert = true;
+    else if (ph < THRESHOLDS.PH_LOW || ph > THRESHOLDS.PH_HIGH) warn = true;
+  }
+
+  if (temp != null) {
+    if (temp < THRESHOLDS.TEMP_LOW_ALERT || temp > THRESHOLDS.TEMP_HIGH_ALERT) alert = true;
+    else if (temp < THRESHOLDS.TEMP_LOW || temp > THRESHOLDS.TEMP_HIGH) warn = true;
+  }
+
+  if (bat != null) {
+    if (bat < THRESHOLDS.BAT_ALERT) alert = true;
+    else if (bat < THRESHOLDS.BAT_LOW) warn = true;
+  }
+
+  if (alert) return { level: "alert", text: "Cảnh báo ALERT" };
+  if (warn) return { level: "warn", text: "Cảnh báo WARN" };
+
+  return { level: "normal", text: "Bình thường" };
+}
+
+function rowClassFromLevel(level) {
+  if (level === "offline") return "row-offline";
+  if (level === "alert") return "row-danger";
+  if (level === "warn") return "row-warning";
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   return "row-normal";
 }
 
@@ -237,7 +328,11 @@ async function renderTable() {
   const tbody = $("deviceTableBody");
   if (!tbody) return;
 
+<<<<<<< HEAD
   tbody.innerHTML = `<tr><td colspan="10">Đang tải dữ liệu...</td></tr>`;
+=======
+  tbody.innerHTML = `<tr><td colspan="9">Đang tải dữ liệu...</td></tr>`;
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   let ids = [];
   try {
@@ -265,6 +360,7 @@ async function renderTable() {
     const temp = safeNum(latest?.temperature, null);
     const ph = safeNum(latest?.ph, null);
     const bat = safeNum(latest?.batteryPct, null);
+<<<<<<< HEAD
     const volt = pickVoltage(latest);
 
     const updated = fmtDateTime(latest?.updatedAt ?? latest?.measuredAt ?? null);
@@ -273,6 +369,15 @@ async function renderTable() {
 
     const tr = document.createElement("tr");
     tr.className = rowClassFromStatus(st);
+=======
+
+    const updated = fmtDateTime(latest?.updatedAt ?? latest?.measuredAt ?? null);
+
+    const { level, text } = classifyStatus(latest);
+
+    const tr = document.createElement("tr");
+    tr.className = rowClassFromLevel(level);
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
     tr.appendChild(td(id));
     tr.appendChild(td(name));
@@ -281,8 +386,12 @@ async function renderTable() {
     tr.appendChild(td(temp == null ? "--" : temp.toFixed(1)));
     tr.appendChild(td(ph == null ? "--" : ph.toFixed(2)));
     tr.appendChild(td(bat == null ? "--" : bat.toFixed(0)));
+<<<<<<< HEAD
     tr.appendChild(td(volt == null ? "--" : volt.toFixed(2)));
     tr.appendChild(td(st.text));
+=======
+    tr.appendChild(td(text));
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
     tr.appendChild(td(updated));
 
     tr.addEventListener("click", () => {
@@ -293,7 +402,11 @@ async function renderTable() {
   });
 
   if (!rows.length) {
+<<<<<<< HEAD
     tbody.innerHTML = `<tr><td colspan="10">Không có thiết bị.</td></tr>`;
+=======
+    tbody.innerHTML = `<tr><td colspan="9">Không có thiết bị.</td></tr>`;
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
   }
 }
 
@@ -304,4 +417,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     renderTable().catch(() => {});
   }, 60 * 1000);
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea

@@ -213,7 +213,11 @@ async function updateKpisForSelected(deviceId) {
   }
 
   // Pin
+<<<<<<< HEAD
   if (bat != null && bat <= THRESHOLDS.BAT_LOW) statuses.push("Pin yếu");
+=======
+  if (bat != null && bat < THRESHOLDS.BAT_LOW) statuses.push("Pin yếu");
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
   // Nếu không có cảnh báo nào
   statusEl.textContent = statuses.length ? statuses.join(" • ") : "Bình thường";
@@ -292,7 +296,11 @@ function renderFourLineAlertBars() {
       else if (ph < THRESHOLDS.PH_LOW) phLow.push({ id: d.id, name: d.name });
     }
 
+<<<<<<< HEAD
     if (bat != null && bat <= THRESHOLDS.BAT_LOW) {
+=======
+    if (bat != null && bat < THRESHOLDS.BAT_LOW) {
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
       batLow.push({ id: d.id, name: d.name });
     }
   });
@@ -314,7 +322,11 @@ function renderFourLineAlertBars() {
   setAlertLine("alertPh", "pH", phMsg ? `${phMsg}.` : "");
 
   const batMsg = batLow.length
+<<<<<<< HEAD
     ? `${joinDeviceLinks(batLow)} pin còn \u2264 ${THRESHOLDS.BAT_LOW}%.`
+=======
+    ? `${joinDeviceLinks(batLow)} pin còn dưới ${THRESHOLDS.BAT_LOW}%.`
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
     : "";
   setAlertLine("alertBattery", "Pin", batMsg);
 
@@ -341,7 +353,11 @@ function syncDevicesForMap() {
     const salinityAbnormal =
       sal != null && (sal > THRESHOLDS.SAL_HIGH || sal < THRESHOLDS.SAL_LOW);
 
+<<<<<<< HEAD
     const batteryLow = bat != null && bat <= THRESHOLDS.BAT_LOW;
+=======
+    const batteryLow = bat != null && bat < THRESHOLDS.BAT_LOW;
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 
     const lastOnline =
       latest?.updatedAt?.toDate

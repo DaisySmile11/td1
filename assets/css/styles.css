@@ -305,11 +305,14 @@ body {
   color: var(--text-muted);
 }
 
+<<<<<<< HEAD
 /* Note card (tách riêng khỏi bảng thiết bị) */
 .note-card {
   margin-top: 0.9rem;
 }
 
+=======
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 /* Table devices */
 
 .device-table {
@@ -987,6 +990,7 @@ body.admin-login-page {
 
 .admin-logout:hover {
   background: #d32f2f;
+<<<<<<< HEAD
 }
 
 .note-card {
@@ -997,4 +1001,6 @@ body.admin-login-page {
     font-size: 1rem;   /* tăng kích thước chữ */
     line-height: 1.6;
     margin: 0;
+=======
+>>>>>>> 05601b8cf60beba4f7133b7e4b310ac1692fdeea
 }
