@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<title>Giám sát độ mặn - Trang chủ</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="assets/css/styles.css" rel="stylesheet"/>
+<link href="assets/favicon.ico" rel="icon"/>
+<!-- Leaflet cho bản đồ -->
+<link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" rel="stylesheet"/>
+<script crossorigin="" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header class="main-header">
+<div class="header-left">
+<div class="logo">Giám sát độ mặn</div>
+<nav class="main-nav">
+<a class="active" href="index.html">Trang chủ</a>
+<a href="devices.html">Danh sách thiết bị</a>
+<a href="admin.html">Admin</a>
+</nav>
+</div>
+<button class="nav-toggle" aria-label="Menu">☰</button>
+</header>
+<!-- ===== ALERT BARS (4 loại) ===== -->
+<div class="alert red" id="alertSalinity"></div>
+<div class="alert purple" id="alertPh"></div>
+<div class="alert yellow" id="alertBattery"></div>
+<div class="alert gray" id="alertOffline"></div>
+<main class="container">
+<section class="section">
+<div class="section-header">
+<h1>Tổng quan hệ thống</h1>
+<p class="section-subtitle">
+          Giám sát độ mặn, nhiệt độ, pH và pin theo thời gian thực.
+        </p>
+</div>
+<div class="filter-row">
+<div class="filter-group">
+<label for="deviceSelect">Chọn thiết bị hiển thị:</label>
+<div class="select-wrapper">
+<select id="deviceSelect"></select>
+<span class="select-arrow">▼</span>
+</div>
+<small class="hint">
+            Dữ liệu lấy trực tiếp từ Firestore (realtime).
+          </small>
+</div>
+<div class="filter-group">
+<label for="timeRange">Khoảng thời gian:</label>
+<div class="select-wrapper">
+<select id="timeRange">
+<option value="last24h" selected>Last 24h</option>
+<option value="last7d">Last 7d</option>
+<option value="last30d">Last 30d</option>
+</select>
+<span class="select-arrow">▼</span>
+</div>
+</div>
+</div>
+<!-- TÊN TRẠM + nút chi tiết -->
+<div class="current-station-container">
+<div class="current-station-row">
+<div class="current-station-name" id="currentStationName">Chưa chọn trạm</div>
+<a class="btn-link" href="device.html" id="detailLink">Xem chi tiết</a>
+</div>
+</div>
+<div class="cards-row">
+<div class="card kpi-card">
+<h3>Độ mặn</h3>
+<p class="kpi-value" id="kpiSalinity">-- ‰</p>
+<p class="kpi-note" id="kpiSalinityNote">Chưa chọn thiết bị</p>
+</div>
+<div class="card kpi-card">
+<h3>Nhiệt độ nước</h3>
+<p class="kpi-value" id="kpiTemperature">-- °C</p>
+<p class="kpi-note" id="kpiTemperatureNote">Chưa chọn thiết bị</p>
+</div>
+<div class="card kpi-card">
+<h3>pH nước</h3>
+<p class="kpi-value" id="kpiPh">--</p>
+<p class="kpi-note" id="kpiPhNote">Chưa chọn thiết bị</p>
+</div>
+<div class="card kpi-card">
+<h3>Mức pin</h3>
+<p class="kpi-value" id="kpiBattery">-- %</p>
+<p class="kpi-note" id="kpiBatteryNote">Chưa chọn thiết bị</p>
+</div>
+<div class="card kpi-card">
+<h3>Trạng thái thiết bị</h3>
+<p class="kpi-value" id="kpiStatus">--</p>
+<p class="kpi-note" id="kpiStatusNote">Chưa chọn thiết bị</p>
+</div>
+</div>
+</section>
+<section class="section grid-2">
+<div class="card">
+<div class="card-header">
+<h2>Biểu đồ độ mặn / nhiệt độ / pH / pin</h2>
+</div>
+<div class="chart-container"><canvas id="mainChart"></canvas></div>
+<div class="note-pill">
+<span class="note-pill-label">NOTE</span>
+<span class="note-pill-text">Biểu đồ đang lấy dữ liệu thật từ Firestore.</span>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h2>Bản đồ thiết bị (Việt Nam)</h2>
+</div>
+<div class="map-container" id="map"></div>
+<div class="legend">
+<span class="legend-item"><span class="legend-dot legend-active"></span> Active</span>
+<span class="legend-item"><span class="legend-dot legend-highsal"></span> Độ mặn bất thường</span>
+<span class="legend-item"><span class="legend-dot legend-lowbat"></span> Pin yếu</span>
+<span class="legend-item"><span class="legend-dot legend-offline"></span> Offline</span>
+</div>
+</div>
+</section>
+</main>
+<footer class="main-footer">
+<span>Giám sát độ mặn nước © 2025</span>
+</footer>
+<!-- JS modules -->
+<script src="assets/js/data.js" type="module"></script>
+<script src="assets/js/charts.js" type="module"></script>
+<script src="assets/js/map.js" type="module"></script>
+<script src="assets/js/app.js" type="module"></script>
+<script src="assets/js/admin.js"></script><script src="assets/js/nav.js"></script>
+</body>
+</html>

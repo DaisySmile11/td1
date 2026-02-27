@@ -1,0 +1,16 @@
+salinity-dashboard/
+├─ index.html               (Trang chủ – dashboard + bản đồ)
+├─ devices.html             
+├─ device.html             
+├─ assets/
+│  ├─ css/
+│  │   └─ styles.css
+│  └─ js/
+│      ├─ data.js          (Demo data + cấu hình chung)
+│      ├─ charts.js        (Xử lý biểu đồ)
+│      ├─ map.js           (Xử lý bản đồ Việt Nam + marker)
+│      └─ app.js           
+│      └─ nav.js           
+│      └─ devices.js           
+│      └─ device.js          
+

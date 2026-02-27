@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Danh sách thiết bị - Giám sát độ mặn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+<link rel="icon" href="assets/favicon.ico" />
+</head>
+<body>
+  <header class="main-header">
+<div class="header-left">
+<div class="logo">Giám sát độ mặn</div>
+<nav class="main-nav">
+<a href="index.html">Trang chủ</a>
+<a class="active" href="devices.html">Danh sách thiết bị</a>
+<a href="admin.html">Admin</a>
+</nav>
+</div>
+<button class="nav-toggle" aria-label="Menu">☰</button>
+</header>
+
+  <main class="container">
+    <section class="section">
+      <div class="section-header">
+        <h1>Danh sách thiết bị</h1>
+        <p class="section-subtitle">
+          Tổng hợp trạng thái các thiết bị đo độ mặn hiện đang cấu hình trong hệ thống.
+        </p>
+      </div>
+
+      <div class="card">
+        <table class="device-table">
+          <thead>
+            <tr>
+              <th>Mã thiết bị</th>
+              <th>Tên hiển thị</th>
+              <th>Vị trí</th>
+              <th>Độ mặn (‰)</th>
+              <th>Nhiệt độ (°C)</th>
+              <th>pH</th>
+              <th>Pin (%)</th>
+              <th>Voltage (V)</th>
+              <th>Trạng thái</th>
+              <th>Cập nhật cuối</th>
+            </tr>
+          </thead>
+          <tbody id="deviceTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card note-card">
+        <p class="note-inline">
+          <strong>Ngưỡng đánh giá trạng thái thiết bị:</strong><br />
+          Độ mặn: 8‰ - 12‰.<br />
+          pH: 6.5 - 8.5.<br />
+          Nhiệt độ: 25°C - 32°C.<br />
+          Pin: &gt; 20%.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <span>Giám sát độ mặn nước &copy; 2025</span>
+  </footer>
+
+  <!-- ✅ chỉ load devices.js -->
+  <script type="module" src="assets/js/devices.js"></script>
+  <script src="assets/js/nav.js"></script>
+</body>
+</html>

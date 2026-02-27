@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Đăng nhập Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/favicon.png" />
+</head>
+
+<body class="admin-login-page">
+  <main class="admin-login-wrap">
+    <div class="admin-login-card" role="region" aria-label="Đăng nhập tài khoản admin">
+      <div class="admin-brand">
+        <img class="admin-favicon" src="assets/favicon.png" alt="Favicon" />
+      </div>
+
+      <h1 id="adminTitle" class="admin-title">Đăng nhập tài khoản admin</h1>
+
+      <!-- Login form (shown when NOT authenticated) -->
+      <form id="adminLoginForm" class="admin-form" autocomplete="on">
+        <div class="admin-field">
+          <label for="adminAccount">Tên đăng nhập:</label>
+          <input id="adminAccount" name="account" type="text" autocomplete="username" required />
+        </div>
+
+        <div class="admin-field">
+          <label for="adminPassword">Mật khẩu</label>
+          <input id="adminPassword" name="password" type="password" autocomplete="current-password" required />
+        </div>
+
+        <button class="admin-submit" type="submit">Đăng nhập</button>
+
+        <!-- NEW BUTTON -->
+        <button id="goHomeBtnLogin" class="admin-submit" type="button">
+          Đi đến trang chủ →
+        </button>
+
+        <div id="adminMsg" class="admin-msg" aria-live="polite"></div>
+      </form>
+
+      <!-- Logged-in view (shown when authenticated) -->
+      <div id="adminLoggedInActions" class="admin-form" style="display:none">
+        <button id="goHomeBtn" class="admin-submit" type="button">
+          Đi đến trang chủ →
+        </button>
+        <button class="admin-logout" id="adminLogoutBtn" type="button">Logout</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>
