@@ -176,7 +176,7 @@ export function deviceStatusTextFromLatest(latest) {
     case "warning-ph":
       return "pH bất thường";
     case "offline":
-      return "Offline / mất kết nối";
+      return "Offline";
     default:
       return "Không rõ";
   }

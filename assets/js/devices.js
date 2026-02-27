@@ -153,7 +153,7 @@ function buildStatus(latest) {
       offline: true,
       hasSalinityWarn: false,
       hasBatteryWarn: false,
-      text: "Offline / mất kết nối",
+      text: "Offline",
     };
   }
 
